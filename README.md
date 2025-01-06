@@ -13,6 +13,14 @@ It provides decentralized finance (DeFi) solutions and also pioneers the impleme
 
 Haust boasts hight security low commissions and provides its own SDK for native integrations with Telegram and other messengers. Notably, the network introduces Haustoria, a feature enabling liquid staking on various networks directly connected to Haust.
 
+## Update
+- add auto deploy and interact with contract
+- `git pull` and re install dependencies `npm install`
+
+- run deploy: 
+   ```bash
+   npm run deploy
+   ```
 
 ## Features
 
