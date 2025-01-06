@@ -36,7 +36,7 @@ export async function readProxies() {
 }
 
 const claimFaucet = async (address, proxies) => {
-    const maxRetries = 5;
+    const maxRetries = 100;
     let attempt = 0;
     let currentProxy = getRandomProxy(proxies);
 
@@ -55,13 +55,13 @@ const claimFaucet = async (address, proxies) => {
                 axiosConfig.proxy = false;
                 if (currentProxy.startsWith('socks5://')) {
                     axiosConfig.httpsAgent = new SocksProxyAgent(currentProxy);
-                    log.info(`Using SOCKS5 proxy: ${currentProxy} for wallet: ${address}`);
+                    //log.info(`Using SOCKS5 proxy: ${currentProxy} for wallet: ${address}`);
                 } else if (currentProxy.startsWith('socks4://')) {
                     axiosConfig.httpsAgent = new SocksProxyAgent(currentProxy);
-                    log.info(`Using SOCKS4 proxy: ${currentProxy} for wallet: ${address}`);
+                    //log.info(`Using SOCKS4 proxy: ${currentProxy} for wallet: ${address}`);
                 } else if (currentProxy.startsWith('http://') || currentProxy.startsWith('https://')) {
                     axiosConfig.httpsAgent = new HttpsProxyAgent(currentProxy);
-                    log.info(`Using HTTP/HTTPS proxy: ${currentProxy} for wallet: ${address}`);
+                    //log.info(`Using HTTP/HTTPS proxy: ${currentProxy} for wallet: ${address}`);
                 }
             } else {
                 log.warn(`No proxy available for wallet: ${address}. Proceeding without a proxy.`);
@@ -72,11 +72,9 @@ const claimFaucet = async (address, proxies) => {
             return;
         } catch (error) {
             attempt++;
-            log.error(`Error claiming faucet for ${address} (Attempt ${attempt}/${maxRetries}):`, error.message);
 
             if (attempt < maxRetries) {
                 currentProxy = getRandomProxy(proxies);
-                log.warn(`Switching to another random proxy for ${address}...`);
                 await new Promise((resolve) => setTimeout(resolve, 1000));
             } else {
                 log.error(`Failed to claim faucet for ${address} after ${maxRetries} attempts.`);
