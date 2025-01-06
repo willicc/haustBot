@@ -2,6 +2,8 @@ import axios from 'axios';
 import fs from 'fs/promises';
 import log from "./utils/logger.js";
 import iniBapakBudi from "./utils/banner.js";
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { SocksProxyAgent } from 'socks-proxy-agent';
 
 export async function readWallets() {
     try {
@@ -18,52 +20,106 @@ export async function readWallets() {
     }
 }
 
-const claimFaucet = async (address) => {
-    let attempt = 0;
+export async function readProxies() {
+    try {
+        await fs.access("proxy.txt");
+
+        const data = await fs.readFile("proxy.txt", "utf-8");
+        return data.split('\n').map(line => line.trim()).filter(Boolean);
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            log.warn("No proxies found in proxy.txt. Requests will proceed without a proxy.");
+            return [];
+        }
+        throw err;
+    }
+}
+
+const claimFaucet = async (address, proxies) => {
     const maxRetries = 5;
+    let attempt = 0;
+    let currentProxy = getRandomProxy(proxies);
 
     while (attempt < maxRetries) {
         try {
-            const response = await axios.post(
-                'https://faucet-test.haust.network/api/claim',
-                { address },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
+            const axiosConfig = {
+                method: 'post',
+                url: 'https://faucet-test.haust.network/api/claim',
+                data: { address },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            };
 
-            log.info(`Claim successful:`, response.data);
+            if (currentProxy) {
+                axiosConfig.proxy = false;
+                if (currentProxy.startsWith('socks5://')) {
+                    axiosConfig.httpsAgent = new SocksProxyAgent(currentProxy);
+                    log.info(`Using SOCKS5 proxy: ${currentProxy} for wallet: ${address}`);
+                } else if (currentProxy.startsWith('socks4://')) {
+                    axiosConfig.httpsAgent = new SocksProxyAgent(currentProxy);
+                    log.info(`Using SOCKS4 proxy: ${currentProxy} for wallet: ${address}`);
+                } else if (currentProxy.startsWith('http://') || currentProxy.startsWith('https://')) {
+                    axiosConfig.httpsAgent = new HttpsProxyAgent(currentProxy);
+                    log.info(`Using HTTP/HTTPS proxy: ${currentProxy} for wallet: ${address}`);
+                }
+            } else {
+                log.warn(`No proxy available for wallet: ${address}. Proceeding without a proxy.`);
+            }
+
+            const response = await axios(axiosConfig);
+            log.info(`Claim successful for ${address}:`, response.data);
             return;
         } catch (error) {
             attempt++;
-            log.error(`Error claiming faucet:`, error.message);
+            log.error(`Error claiming faucet for ${address} (Attempt ${attempt}/${maxRetries}):`, error.message);
 
             if (attempt < maxRetries) {
-                log.warn(`Retrying in 10 seconds... Attempt ${attempt} of ${maxRetries}`);
-                await new Promise((resolve) => setTimeout(resolve, 10000));
+                currentProxy = getRandomProxy(proxies);
+                log.warn(`Switching to another random proxy for ${address}...`);
+                await new Promise((resolve) => setTimeout(resolve, 1000));
             } else {
-                log.error(`Max retries reached for ${address}. Skipping.`);
+                log.error(`Failed to claim faucet for ${address} after ${maxRetries} attempts.`);
             }
         }
     }
 };
 
+function getRandomProxy(proxies) {
+    if (proxies.length === 0) {
+        return null;
+    }
+    const randomIndex = Math.floor(Math.random() * proxies.length);
+    return proxies[randomIndex];
+}
+
 const main = async () => {
     log.info(iniBapakBudi);
     await new Promise((resolve) => setTimeout(resolve, 3000));
+
     const wallets = await readWallets();
+    const proxies = await readProxies();
 
     if (wallets.length === 0) {
         log.warn("No wallets to process.");
         return;
     }
 
-    for (const wallet of wallets) {
-        log.info(`Processing wallet: ${wallet.address}`);
-        await claimFaucet(wallet.address);
-        await new Promise((resolve) => setTimeout(resolve, 10 * 1000)); // 10 seconds delay
+    const tasks = wallets.map((wallet) => {
+        if (proxies.length > 0) {
+            log.info(`Starting claim process for wallet: ${wallet.address}`);
+        } else {
+            log.warn(`No proxies available for wallet: ${wallet.address}. Proceeding without a proxy.`);
+        }
+
+        return claimFaucet(wallet.address, proxies);
+    });
+
+    try {
+        await Promise.all(tasks);
+        log.info("All wallet claims processed.");
+    } catch (error) {
+        log.error("Error processing wallet claims:", error.message);
     }
 };
 
