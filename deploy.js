@@ -4,7 +4,7 @@ import fs from "fs/promises";
 import banner from "./utils/banner.js";
 import log from "./utils/logger.js";
 
-const provider = new ethers.JsonRpcProvider("https://haust-testnet-rpc.eu-north-2.gateway.fm");
+const provider = new ethers.JsonRpcProvider("https://haust-network-testnet-rpc.eu-north-2.gateway.fm");
 
 export async function readWallets() {
     try {

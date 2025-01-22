@@ -36,7 +36,7 @@ export async function readProxies() {
 }
 
 const claimFaucet = async (address, proxies) => {
-    const maxRetries = 100;
+    const maxRetries = 20;
     let attempt = 0;
     let currentProxy = getRandomProxy(proxies);
 
@@ -44,7 +44,7 @@ const claimFaucet = async (address, proxies) => {
         try {
             const axiosConfig = {
                 method: 'post',
-                url: 'https://faucet-test.haust.network/api/claim',
+                url: 'https://faucet.haust.app/api/claim',
                 data: { address },
                 headers: {
                     'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ const claimFaucet = async (address, proxies) => {
             return;
         } catch (error) {
             attempt++;
-
+            log.error(`Failed to claim faucet for ${address} error ${error.message}`);
             if (attempt < maxRetries) {
                 currentProxy = getRandomProxy(proxies);
                 await new Promise((resolve) => setTimeout(resolve, 1000));
