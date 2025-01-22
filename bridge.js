@@ -8,7 +8,7 @@ const USDT = '0x93C5d30a7509E60871B77A3548a5BD913334cd35';
 const USDC = '0xadbf21cCdFfe308a8d83AC933EF5D3c98830397F';
 const WBTC = '0x21472DF1B5d2b673F6444B41258C6460294a2C06';
 const BRIDGE_CONTRACT = '0x5E2C8EF3035feeC3056864512Aaf8f4dc88CaEe3';
-const RPC_URL = 'https://eth-sepolia.g.alchemy.com/v2/VIamcJPR237EaK5LkSnBOaP-xEIi7TpX';
+const RPC_URL = 'https://sepolia.drpc.org';
 
 async function readWallets() {
     try {
