@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node main.js",
     "setup": "node setup.js",
-    "deploy": "node deploy.js"
+    "deploy": "node deploy.js",
+    "bridge": "node bridge.js"
   },
   "author": "zlkcyber",
   "license": "MIT",
