@@ -13,6 +13,12 @@ It provides decentralized finance (DeFi) solutions and also pioneers the impleme
 
 Haust boasts hight security low commissions and provides its own SDK for native integrations with Telegram and other messengers. Notably, the network introduces Haustoria, a feature enabling liquid staking on various networks directly connected to Haust.
 
+## Auto Mint NFT
+- its will try to mint using existing wallet in `wallets.json`
+   ```bash
+   npm run mint
+   ```
+
 ## auto mint / bridge and distribute eth
 - auto distribute eth sepilia to another addr in wallets json
 - just input `y` if you want to auto distribute eth to another wallet

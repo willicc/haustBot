@@ -7,7 +7,8 @@
     "start": "node main.js",
     "setup": "node setup.js",
     "deploy": "node deploy.js",
-    "bridge": "node bridge.js"
+    "bridge": "node bridge.js",
+    "mint": "node mint.js"
   },
   "author": "zlkcyber",
   "license": "MIT",
