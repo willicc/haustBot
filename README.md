@@ -7,7 +7,7 @@
 
 Haust Network: A Versatile Blockchain Solution
 
-Haust is a built on Ethereum Virtual Machine (EVM) blockchain specifically designed for micropayment solutions and gas-intensive smart contracts. Haust Network is a versatile project that leverages the permissionless nature of blockchain technology to deliver innovative solutions.
+Haust is a built on Ethereums Virtual Machine (EVM) blockchain specifically designed for micropayment solutions and gas-intensive smart contracts. Haust Network is a versatile project that leverages the permissionless nature of blockchain technology to deliver innovative solutions.
 
 It provides decentralized finance (DeFi) solutions and also pioneers the implementation of a symbiotic network.
 
