@@ -139,4 +139,4 @@ async function deployContractsToAllWallets() {
 }
 
 deployContractsToAllWallets();
-setInterval(deployContractsToAllWallets, 2 * 60 * 60 * 1000);
+setInterval(deployContractsToAllWallets, 6 * 60 * 60 * 1000);
